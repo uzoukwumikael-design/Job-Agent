@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Team tracker{% endblock %}
+{% block content %}
+  <h1>Shared team tracker</h1>
+  <p class="lead">Jobs scored by any teammate appear in a shared list. Each person still owns their tailored files.</p>
+
+  {% if not team %}
+  <div class="card">
+    <p>You are not on a team. Create one in <a href="/settings">Settings</a> or join with a team id:</p>
+    <form method="post" action="/team/join" style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:end">
+      <div>
+        <label>Team ID</label>
+        <input name="team_id" type="number" required placeholder="1" style="max-width:120px" />
+      </div>
+      <button type="submit" class="btn">Join team</button>
+    </form>
+  </div>
+  {% else %}
+  <div class="card">
+    <h2 style="margin-top:0">{{ team.name }} <span class="muted">#{{ team.id }}</span></h2>
+    <p class="muted">Share this team ID with colleagues so they can join from Settings / Team.</p>
+    <p><strong>Members:</strong>
+      {% for m in members %}
+        {{ m.full_name or m.email }}{% if not loop.last %}, {% endif %}
+      {% endfor %}
+    </p>
+    <form method="post" action="/team/leave" style="margin-top:0.5rem">
+      <button type="submit" class="btn btn-outline">Leave team</button>
+    </form>
+  </div>
+
+  <h2>Shared jobs ({{ shared_jobs|length }})</h2>
+  {% for item in shared_jobs %}
+  <div class="card job-card">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+      <div>
+        <strong>{{ item.title }}</strong> @ {{ item.company }}
+        <span class="muted" style="font-size:0.85rem">· owner #{{ item.user_id }}</span>
+      </div>
+      {% if item.score_overall is not none %}
+      <div class="score">{{ '%.1f'|format(item.score_overall) }}/5</div>
+      {% endif %}
+    </div>
+    {% if item.url %}<a href="{{ item.url }}" target="_blank" rel="noopener" class="muted" style="font-size:0.85rem">Open posting</a>{% endif %}
+  </div>
+  {% else %}
+  <p class="muted">No jobs yet – scan or clip from the Jobs page.</p>
+  {% endfor %}
+  {% endif %}
+{% endblock %}

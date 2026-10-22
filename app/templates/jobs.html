@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Jobs & Tracker{% endblock %}
+{% block content %}
+  {% if team_shared %}<div class="success-banner">Showing shared team jobs</div>{% endif %}
+  <h1>Jobs & Tracker</h1>
+  <p class="lead">Paste a JD, import a URL, or run automated scan across curated company boards (Greenhouse / Ashby / Lever) filtered for AI Advisor & Consultant roles.</p>
+
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  {% if request.query_params.get('scanned') %}
+  <div class="success-banner">Scan complete — {{ request.query_params.get('scanned') }} matching jobs added.</div>
+  {% endif %}
+
+  {% if not user %}
+  <div class="card"><p><a href="/auth/login">Log in</a> to track jobs under your account.</p></div>
+  {% endif %}
+
+  <div style="margin-bottom:1rem">
+    <form method="post" action="/jobs/scan" style="display:inline">
+      <button type="submit" class="btn" {% if not user or not master %}disabled{% endif %}>
+        Auto-scan company boards
+      </button>
+    </form>
+    <span class="muted" style="font-size:0.85rem;margin-left:0.5rem">OpenAI, Anthropic, McKinsey, BCG, Bain, Accenture, Stripe…</span>
+  </div>
+
+  <div class="grid-2">
+    <form method="post" action="/jobs/add" class="card">
+      <h2 style="margin-top:0">Paste job description</h2>
+      <label>Title</label>
+      <input name="title" required placeholder="AI Strategy Consultant" />
+      <label>Company</label>
+      <input name="company" required placeholder="Acme Corp" />
+      <label>Location</label>
+      <input name="location" placeholder="Remote / London" />
+      <label>URL (optional)</label>
+      <input name="url" placeholder="https://..." />
+      <label>Full description</label>
+      <textarea name="description" required></textarea>
+      <button type="submit" class="btn" {% if not user %}disabled{% endif %}>Score &amp; add</button>
+    </form>
+
+    <form method="post" action="/jobs/from-url" class="card">
+      <h2 style="margin-top:0">From URL</h2>
+      <label>Job URL</label>
+      <input name="url" required placeholder="https://boards.greenhouse.io/..." />
+      <label>Title hint</label>
+      <input name="title" />
+      <label>Company hint</label>
+      <input name="company" />
+      <button type="submit" class="btn" {% if not user %}disabled{% endif %}>Fetch, score &amp; add</button>
+      <p class="muted" style="margin-top:0.6rem;font-size:0.85rem">Public pages only.</p>
+    </form>
+  </div>
+
+  <h2>Pipeline ({{ jobs|length }})</h2>
+  {% for item in jobs %}
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+      <div>
+        <strong>{{ item.title }}</strong> @ {{ item.company }}
+        <div class="muted" style="font-size:0.88rem">
+          {{ item.location or 'Location n/a' }} · {{ item.source }}
+          {% if item.url and not item.url.startswith('manual') %}
+            · <a href="{{ item.url }}" target="_blank" rel="noopener">Open</a>
+          {% endif %}
+        </div>
+      </div>
+      <div style="text-align:right">
+        {% if item.score_overall is not none %}
+          <div class="score">{{ '%.1f'|format(item.score_overall) }}/5</div>
+          {% set rec = (item.score_json or {}).get('recommendation', 'maybe') %}
+          <span class="badge badge-{{ rec }}">{{ rec }}</span>
+        {% endif %}
+        <div class="muted" style="font-size:0.8rem;margin-top:0.2rem">{{ item.stage }}</div>
+      </div>
+    </div>
+    
+    {% if item.salary_json %}
+    <div class="muted" style="margin-top:0.5rem;font-size:0.88rem">
+      Salary est: {{ item.salary_json.get('currency','USD') }}
+      {{ item.salary_json.get('base_low') }}–{{ item.salary_json.get('base_high') }} base
+      (total {{ item.salary_json.get('total_low') }}–{{ item.salary_json.get('total_high') }})
+      · confidence {{ item.salary_json.get('confidence','?') }}
+    </div>
+    {% endif %}
+    {% if item.form_answers_json %}
+    <details style="margin-top:0.5rem">
+      <summary class="muted" style="cursor:pointer;font-size:0.9rem">Form answer drafts</summary>
+      {% for a in item.form_answers_json %}
+      <p style="margin:0.5rem 0 0;font-size:0.88rem"><strong>{{ a.question }}</strong><br/>{{ a.answer }}</p>
+      {% endfor %}
+    </details>
+    {% endif %}
+
+    {% if item.score_json and item.score_json.get('notes') %}
+    <p class="muted" style="margin-top:0.5rem;font-size:0.88rem">{{ item.score_json.notes }}</p>
+    {% endif %}
+    <div style="margin-top:0.85rem;display:flex;gap:0.45rem;flex-wrap:wrap;align-items:center">
+      {% if item.stage not in ['tailored', 'applied', 'interview', 'offer'] %}
+      <form method="post" action="/jobs/{{ item.job_id }}/tailor" style="display:inline">
+        <button type="submit" class="btn btn-sm">Generate resume + cover</button>
+      </form>
+      {% endif %}
+      {% if item.tailored_pdf %}<a class="btn btn-sm btn-outline" href="/download/{{ item.tailored_pdf }}">PDF</a>{% endif %}
+      {% if item.tailored_docx %}<a class="btn btn-sm btn-outline" href="/download/{{ item.tailored_docx }}">DOCX</a>{% endif %}
+      {% if item.cover_path %}<a class="btn btn-sm btn-outline" href="/download/{{ item.cover_path }}">Cover</a>{% endif %}
+      <form method="post" action="/jobs/{{ item.job_id }}/form-answers" style="display:inline">
+        <button type="submit" class="btn btn-sm btn-ghost">Form answers</button>
+      </form>
+      <form method="post" action="/jobs/{{ item.job_id }}/salary" style="display:inline">
+        <button type="submit" class="btn btn-sm btn-ghost">Salary band</button>
+      </form>
+      <form method="post" action="/jobs/{{ item.id }}/stage" style="display:inline;margin-left:auto">
+        <select name="stage" onchange="this.form.submit()" style="width:auto;margin:0;padding:0.3rem 0.5rem">
+          {% for s in ['saved','scored','tailored','applied','interview','offer','rejected','closed'] %}
+          <option value="{{ s }}" {% if item.stage == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+  </div>
+  {% else %}
+  <p class="muted">No jobs yet.</p>
+  {% endfor %}
+{% endblock %}

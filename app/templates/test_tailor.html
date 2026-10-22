@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Test Tailor Lab{% endblock %}
+{% block content %}
+  <h1>Test Tailor Lab</h1>
+  <p class="lead">
+    Paste any job description to score fit and generate a tailored resume + cover letter
+    <strong>without adding it to your tracker</strong>. Use this to validate how strong your
+    master profile is against real postings.
+  </p>
+
+  {% if not user %}
+  <div class="card"><p><a href="/auth/login">Log in</a> first.</p></div>
+  {% elif not master %}
+  <div class="card"><p>Build your <a href="/intake">profile</a> first.</p></div>
+  {% else %}
+
+  <form method="post" action="/test-tailor" class="card">
+    <div class="grid-2">
+      <div>
+        <label>Job title</label>
+        <input name="job_title" required placeholder="AI Strategy Consultant" value="{{ request.form.job_title if request.form else '' }}" />
+      </div>
+      <div>
+        <label>Company</label>
+        <input name="company" required placeholder="Example Corp" value="{{ request.form.company if request.form else '' }}" />
+      </div>
+    </div>
+    <label>Full job description</label>
+    <textarea name="description" required placeholder="Paste the complete JD here..." style="min-height:220px">{{ request.form.description if request.form else '' }}</textarea>
+    <button type="submit" class="btn">Score + Tailor (test run)</button>
+  </form>
+
+  {% if result %}
+  <h2>Results</h2>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+      <div>
+        <strong>{{ result.job.title }}</strong> @ {{ result.job.company }}
+      </div>
+      <div style="text-align:right">
+        <div class="score">{{ '%.1f'|format(result.score.overall) }}/5</div>
+        <span class="badge badge-{{ result.score.recommendation }}">{{ result.score.recommendation }}</span>
+      </div>
+    </div>
+    {% if result.score.notes %}
+    <p class="muted" style="margin-top:0.5rem">{{ result.score.notes }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Evidence map</h2>
+    {% for e in result.score.evidence_map or [] %}
+    <p style="margin-bottom:0.6rem;font-size:0.9rem">
+      <strong>{{ e.jd_requirement }}</strong><br/>
+      <span class="muted">→ {{ e.master_proof }} ({{ e.strength }})</span>
+    </p>
+    {% else %}
+    <p class="muted">No evidence rows returned.</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Tailored headline &amp; summary</h2>
+    <p><strong>{{ result.content.headline }}</strong></p>
+    <p>{{ result.content.summary }}</p>
+    {% if result.content.skills_order %}
+    <p class="muted" style="margin-top:0.5rem">Skills: {{ result.content.skills_order | join(" · ") }}</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Selected experience bullets</h2>
+    {% for exp in result.content.selected_experiences or [] %}
+    <p><strong>{{ exp.title }}</strong> | {{ exp.company }} <span class="muted">{{ exp.dates }}</span></p>
+    <ul style="margin:0.3rem 0 0.8rem 1.2rem">
+      {% for b in exp.bullets or [] %}<li>{{ b }}</li>{% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No experiences selected — strengthen your master profile.</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Cover letter draft</h2>
+    <pre style="white-space:pre-wrap;font-family:inherit;font-size:0.92rem">{{ result.cover }}</pre>
+  </div>
+
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+    {% if result.paths.pdf %}
+    <a class="btn btn-outline" href="/download/{{ result.paths.pdf }}">Download PDF</a>
+    {% endif %}
+    {% if result.paths.docx %}
+    <a class="btn btn-outline" href="/download/{{ result.paths.docx }}">Download DOCX</a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% endif %}
+{% endblock %}

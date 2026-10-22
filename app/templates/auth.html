@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ mode|capitalize }} – AI Advisor Job Agent{% endblock %}
+{% block content %}
+  <h1>{{ "Create account" if mode == "register" else "Sign in" }}</h1>
+  <p class="lead">Each user has their own job tracker and STAR story bank. Master career profile is shared on this server instance.</p>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post" action="/auth/{{ mode }}" class="card" style="max-width:420px">
+    {% if mode == "register" %}
+    <label>Full name</label>
+    <input name="full_name" placeholder="Alex Rivera" />
+    {% endif %}
+    <label>Email</label>
+    <input type="email" name="email" required autocomplete="email" />
+    <label>Password</label>
+    <input type="password" name="password" required minlength="6" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" />
+    <button type="submit" class="btn" style="width:100%">{{ "Register" if mode == "register" else "Login" }}</button>
+  </form>
+  {% if oauth.google or oauth.linkedin %}
+  <div class="card" style="max-width:420px;margin-top:1rem">
+    <p class="muted" style="margin-bottom:0.6rem">Or continue with</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+      {% if oauth.google %}<a class="btn btn-outline" href="/auth/google">Google</a>{% endif %}
+      {% if oauth.linkedin %}<a class="btn btn-outline" href="/auth/linkedin">LinkedIn</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+  <p class="muted" style="margin-top:1rem">
+    {% if mode == "login" %}No account? <a href="/auth/register">Register</a>{% else %}Have an account? <a href="/auth/login">Login</a>{% endif %}
+  </p>
+{% endblock %}

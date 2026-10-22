@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Home – AI Advisor Job Agent{% endblock %}
+{% block content %}
+  <h1>AI Advisor / Consultant Job Agent</h1>
+  <p class="lead">
+    Automated discovery, fit scoring, ATS-safe resume & cover letter generation, and application tracking —
+    purpose-built for non-technical AI Advisor, AI Consultant, and Strategy roles.
+  </p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h2 style="margin-top:0">Your Profile</h2>
+      {% if has_master %}
+        <p>Master profile loaded for <strong>{{ master_name }}</strong>.</p>
+        <a class="btn" href="/profile">View / Edit Profile</a>
+      {% else %}
+        <p class="muted">No master career profile yet. Start with a free-form dump of your experience.</p>
+        <a class="btn" href="/intake">Build Profile</a>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">Pipeline</h2>
+      <p><span class="score">{{ tracker_count }}</span> <span class="muted">jobs tracked</span></p>
+      <a class="btn" href="/jobs">Open Tracker</a>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.5rem">
+    <h2 style="margin-top:0">Target Roles</h2>
+    <p class="muted" style="margin-bottom:0.75rem">Default focus (you can change in intake):</p>
+    <p>
+      {% for t in target_titles %}
+        <span class="badge" style="background:#1e3a5f;color:#93c5fd;margin:0.2rem">{{ t }}</span>
+      {% endfor %}
+    </p>
+  </div>
+
+  <h2>How it works</h2>
+  <ol style="margin-left:1.2rem;color:var(--muted)">
+    <li style="margin-bottom:0.4rem"><strong>Intake</strong> – paste notes, LinkedIn text, or old resume content. AI structures a master career database (no invention).</li>
+    <li style="margin-bottom:0.4rem"><strong>Add jobs</strong> – paste a job description or URL. The agent scores fit on skills, level, domain, location, legitimacy.</li>
+    <li style="margin-bottom:0.4rem"><strong>Tailor</strong> – one click generates ATS single-column PDF + DOCX + cover letter using only your real experience.</li>
+    <li style="margin-bottom:0.4rem"><strong>Interview</strong> – STAR story bank + negotiation scripts from your real experience.</li>
+    <li style="margin-bottom:0.4rem"><strong>Track</strong> – move jobs through Saved → Scored → Tailored → Applied → Interview → Offer.</li>
+  </ol>
+{% endblock %}

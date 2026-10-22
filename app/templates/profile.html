@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+  <h1>{{ master.contact.full_name }}</h1>
+  <p class="muted">
+    {{ master.contact.email }}
+    {% if master.contact.phone %} · {{ master.contact.phone }}{% endif %}
+    {% if master.contact.location %} · {{ master.contact.location }}{% endif %}
+  </p>
+
+  {% if master.professional_summary %}
+  <div class="card">
+    <h2 style="margin-top:0">Summary</h2>
+    <p>{{ master.professional_summary }}</p>
+  </div>
+  {% endif %}
+
+  <div class="card">
+    <h2 style="margin-top:0">Experience ({{ master.experiences|length }})</h2>
+    {% for exp in master.experiences %}
+      <div style="margin-bottom:1rem">
+        <strong>{{ exp.title }}</strong> @ {{ exp.company }}
+        <div class="muted">{{ exp.start_date }} – {{ exp.end_date or 'Present' }}</div>
+        <ul>
+          {% for b in exp.bullets %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <p class="muted">No experiences structured yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Skills</h2>
+    {% for cat in master.skills %}
+      <p><strong>{{ cat.category }}:</strong> {{ cat.skills | join(", ") }}</p>
+    {% else %}
+      <p class="muted">None yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Target Preferences</h2>
+    <p>
+      {% for t in master.preferences.target_titles %}
+        <span class="badge" style="background:#1e3a5f;color:#93c5fd;margin:0.15rem">{{ t }}</span>
+      {% endfor %}
+    </p>
+    <p class="muted">Locations: {{ master.preferences.locations | join(", ") }}</p>
+  </div>
+
+  <a class="btn btn-outline" href="/intake">Re-run Intake / Update</a>
+{% endblock %}

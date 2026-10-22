@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Interview Prep{% endblock %}
+{% block content %}
+  <h1>Interview prep</h1>
+  <p class="lead">STAR story bank and negotiation scripts tailored for AI Advisor / Consultant roles. Built only from your master profile.</p>
+
+  {% if not user %}
+  <div class="card"><p>Please <a href="/auth/login">log in</a> to save STAR stories to your account.</p></div>
+  {% endif %}
+
+  <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1rem">
+    <form method="post" action="/interview/star">
+      <button type="submit" class="btn" {% if not master %}disabled{% endif %}>Generate STAR bank</button>
+    </form>
+    <form method="post" action="/interview/negotiate">
+      <button type="submit" class="btn btn-outline" {% if not master %}disabled{% endif %}>Negotiation pack</button>
+    </form>
+  </div>
+
+  {% if stories %}
+  <h2>Your STAR stories ({{ stories|length }})</h2>
+  {% for s in stories %}
+  <div class="card star-card">
+    <h3>{{ s.title }}</h3>
+    <p>
+      {% for t in (s.themes or []) %}
+      <span class="badge" style="background:#1e3a5f;color:#93c5fd;margin:0.1rem">{{ t }}</span>
+      {% endfor %}
+    </p>
+    <div class="star-label">Situation</div>
+    <p>{{ s.situation }}</p>
+    <div class="star-label">Task</div>
+    <p>{{ s.task }}</p>
+    <div class="star-label">Action</div>
+    <p style="white-space:pre-wrap">{{ s.action }}</p>
+    <div class="star-label">Result</div>
+    <p>{{ s.result }}</p>
+    {% if s.reflection %}
+    <div class="star-label">Reflection</div>
+    <p class="muted">{{ s.reflection }}</p>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% else %}
+  <p class="muted">No stories yet. Generate from your profile after intake.</p>
+  {% endif %}
+
+  {% if negotiation %}
+  <h2>Negotiation pack</h2>
+  <div class="card">
+    <p>{{ negotiation.market_framing }}</p>
+  </div>
+  {% for sc in negotiation.scripts or [] %}
+  <div class="card">
+    <strong>{{ sc.scenario }}</strong>
+    <p style="margin-top:0.5rem;white-space:pre-wrap">{{ sc.script }}</p>
+  </div>
+  {% endfor %}
+  {% if negotiation.checklist %}
+  <div class="card">
+    <strong>Checklist</strong>
+    <ul style="margin:0.5rem 0 0 1.2rem">
+      {% for c in negotiation.checklist %}<li>{{ c }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% endif %}
+{% endblock %}

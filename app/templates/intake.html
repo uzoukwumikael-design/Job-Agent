@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Profile Intake{% endblock %}
+{% block content %}
+  <h1>Build Your Master Career Profile</h1>
+  <p class="lead">
+    Paste everything relevant: work history, projects, education, certifications, skills, LinkedIn export, performance notes.
+    Focus on AI advisory, consulting, strategy, transformation, change management, ethics, ROI outcomes.
+    The AI will structure it — it will <strong>never invent</strong> employers or metrics.
+  </p>
+
+  {% if error %}
+  <div class="error">{{ error }}</div>
+  {% endif %}
+
+  <form method="post" action="/intake" class="card">
+    <label for="raw_notes">Your career information (free text)</label>
+    <textarea id="raw_notes" name="raw_notes" placeholder="Example:
+Name: Alex Rivera
+Email: alex@example.com
+Location: Remote / London
+
+Experience:
+Senior AI Consultant @ Acme Advisory (2021–Present)
+- Led AI strategy for 3 Fortune 500 clients, influencing $12M+ transformation budgets
+- Designed responsible AI governance framework adopted by 2 business units
+...
+Education: MSc Management, LSE
+Skills: AI strategy, stakeholder management, change management, ROI business cases
+">{{ raw_notes or '' }}</textarea>
+    <button type="submit" class="btn">Structure Profile with AI</button>
+  </form>
+
+  <p class="muted" style="margin-top:1rem">Requires a valid LLM API key in <code>.env</code> (OpenAI / xAI / compatible).</p>
+{% endblock %}

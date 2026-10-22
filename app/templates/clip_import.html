@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Import clipped job{% endblock %}
+{% block content %}
+  <h1>Import clipped job</h1>
+  {% if not user %}
+  <div class="card">
+    <p>Please <a href="/auth/login">log in</a>, then run the bookmarklet again (or paste below).</p>
+  </div>
+  {% endif %}
+  <form method="post" action="/jobs/clip" class="card">
+    <label>Title</label>
+    <input name="title" required value="{{ title }}" />
+    <label>Company</label>
+    <input name="company" placeholder="Guess or type company name" value="" />
+    <label>Location</label>
+    <input name="location" />
+    <label>URL</label>
+    <input name="url" value="{{ url }}" />
+    <label>Description (from page)</label>
+    <textarea name="description" required style="min-height:200px">{{ description }}</textarea>
+    <button type="submit" class="btn" {% if not user %}disabled{% endif %}>Score &amp; add to tracker</button>
+  </form>
+{% endblock %}

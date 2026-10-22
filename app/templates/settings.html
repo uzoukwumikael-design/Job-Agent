@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+  <h1>Settings</h1>
+  <p class="lead">Alerts, language, and team preferences for your account.</p>
+
+  {% if request.query_params.get('saved') %}
+  <div class="success-banner">Settings saved.</div>
+  {% endif %}
+  {% if request.query_params.get('team') %}
+  <div class="success-banner">Team created and linked to your account.</div>
+  {% endif %}
+
+  <form method="post" action="/settings" class="card">
+    <h2 style="margin-top:0">Alerts</h2>
+    <label>Notify when fit score ≥</label>
+    <input type="number" step="0.1" min="1" max="5" name="alert_min_score"
+           value="{{ user.alert_min_score or 4.0 }}" style="max-width:120px" />
+
+    <label style="margin-top:0.5rem">
+      <input type="checkbox" name="alerts_email" value="1" {% if user.alerts_email %}checked{% endif %} />
+      Email alerts ({{ user.email }})
+    </label>
+    <p class="muted" style="font-size:0.85rem;margin:0.2rem 0 0.8rem">Requires RESEND_API_KEY or SMTP in server env.</p>
+
+    <label>
+      <input type="checkbox" name="alerts_telegram" value="1" {% if user.alerts_telegram %}checked{% endif %} />
+      Telegram alerts
+    </label>
+    <label>Telegram chat ID</label>
+    <input name="telegram_chat_id" placeholder="123456789" value="{{ user.telegram_chat_id or '' }}" />
+    <p class="muted" style="font-size:0.85rem">Message your bot first, then put your chat id here. Set TELEGRAM_BOT_TOKEN on the server.</p>
+
+    <h2>Resume language</h2>
+    <label>Preferred language for tailored resumes &amp; cover letters</label>
+    <select name="preferred_language">
+      {% for code, label in [('en','English'),('fr','French'),('de','German'),('es','Spanish'),('pt','Portuguese'),('it','Italian'),('nl','Dutch')] %}
+      <option value="{{ code }}" {% if preferred_language == code %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="btn" style="margin-top:0.5rem">Save settings</button>
+  </form>
+
+  <div class="card">
+    <h2 style="margin-top:0">Team / agency seat</h2>
+    <p class="muted">Create a lightweight team so multiple accounts can share a label (full shared tracker can be extended later).</p>
+    {% if user.team_id %}
+    <p>You are on team id <strong>{{ user.team_id }}</strong>.
+       <a href="/team">Open shared tracker</a></p>
+    <form method="post" action="/team/leave"><button class="btn btn-outline" type="submit">Leave team</button></form>
+    {% else %}
+    <form method="post" action="/team/join" style="margin-bottom:1rem">
+      <label>Or join existing team by ID</label>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+        <input name="team_id" type="number" placeholder="Team ID" style="max-width:140px" />
+        <button type="submit" class="btn btn-outline">Join</button>
+      </div>
+    </form>
+    {% endif %}
+    {% if not user.team_id %}
+    <form method="post" action="/team/create">
+      <label>Team name</label>
+      <input name="name" required placeholder="Acme Advisory" />
+      <button type="submit" class="btn btn-outline">Create team</button>
+    </form>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">Clip jobs from any page</h2>
+    <p class="muted">Use the bookmarklet on LinkedIn, Indeed, or company career pages.</p>
+    <a class="btn btn-outline" href="/clip">Get bookmarklet</a>
+  </div>
+{% endblock %}

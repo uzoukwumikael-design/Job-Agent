@@ -1,0 +1,79 @@
+{
+  "updated": "2026-10",
+  "source": "aggregated public estimates (levels.fyi-style, Glassdoor ranges, consulting firm bands) – illustrative, not offers",
+  "currency_default": "USD",
+  "bands": [
+    {
+      "role_patterns": ["ai advisor", "ai consultant", "ai strategy consultant", "responsible ai", "ai ethics"],
+      "level": "mid",
+      "company_type": "enterprise",
+      "location": "US remote",
+      "base_low": 130000, "base_high": 170000,
+      "total_low": 150000, "total_high": 210000,
+      "notes": "Enterprise AI advisory / digital transformation"
+    },
+    {
+      "role_patterns": ["ai advisor", "ai consultant", "ai strategy", "ai transformation"],
+      "level": "senior",
+      "company_type": "enterprise",
+      "location": "US remote",
+      "base_low": 160000, "base_high": 210000,
+      "total_low": 190000, "total_high": 280000,
+      "notes": "Senior advisor with client-facing ownership"
+    },
+    {
+      "role_patterns": ["ai advisor", "ai consultant", "management consultant", "strategy consultant"],
+      "level": "senior",
+      "company_type": "mbb",
+      "location": "US",
+      "base_low": 180000, "base_high": 230000,
+      "total_low": 220000, "total_high": 350000,
+      "notes": "MBB / QuantumBlack / BCG X style AI practices"
+    },
+    {
+      "role_patterns": ["ai consultant", "ai strategy", "digital transformation"],
+      "level": "manager",
+      "company_type": "big4",
+      "location": "US",
+      "base_low": 155000, "base_high": 195000,
+      "total_low": 175000, "total_high": 250000,
+      "notes": "Big 4 AI / analytics manager bands"
+    },
+    {
+      "role_patterns": ["ai advisor", "ai product", "ai strategy"],
+      "level": "senior",
+      "company_type": "ai_lab",
+      "location": "SF bay / US remote",
+      "base_low": 175000, "base_high": 240000,
+      "total_low": 220000, "total_high": 400000,
+      "notes": "Frontier lab non-research advisory / GTM / policy roles; equity heavy"
+    },
+    {
+      "role_patterns": ["ai consultant", "ai engineer", "ml consultant"],
+      "level": "mid",
+      "company_type": "startup",
+      "location": "US remote",
+      "base_low": 120000, "base_high": 160000,
+      "total_low": 140000, "total_high": 220000,
+      "notes": "Growth-stage startup; equity variable"
+    },
+    {
+      "role_patterns": ["ai governance", "responsible ai", "ai ethics", "ai risk"],
+      "level": "senior",
+      "company_type": "enterprise",
+      "location": "US / EU",
+      "base_low": 140000, "base_high": 190000,
+      "total_low": 160000, "total_high": 240000,
+      "notes": "Governance / risk / compliance adjacent AI roles"
+    },
+    {
+      "role_patterns": ["partner", "principal", "director of ai"],
+      "level": "director",
+      "company_type": "consulting",
+      "location": "US",
+      "base_low": 220000, "base_high": 300000,
+      "total_low": 280000, "total_high": 500000,
+      "notes": "Director / principal AI practice leadership"
+    }
+  ]
+}

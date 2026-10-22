@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Clip bookmarklet{% endblock %}
+{% block content %}
+  <h1>Clip this job</h1>
+  <p class="lead">Drag the button below to your bookmarks bar. On any job page, click it to open the import form with title, URL, and page text pre-filled.</p>
+
+  <div class="card">
+    <p style="margin-bottom:1rem">
+      <a class="btn" href="{{ bookmarklet }}">Clip to Job Agent</a>
+    </p>
+    <p class="muted" style="font-size:0.85rem">
+      On mobile, copy the bookmarklet code from the address bar after clicking once while logged in,
+      or use <strong>Jobs → Paste</strong> instead.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin-top:0">How it works</h2>
+    <ol style="margin-left:1.2rem;color:var(--muted)">
+      <li>Log in to this app</li>
+      <li>Bookmark the button above</li>
+      <li>Open a job posting on LinkedIn / Indeed / Greenhouse</li>
+      <li>Click the bookmark → review &amp; save into your tracker with AI scoring</li>
+    </ol>
+  </div>
+{% endblock %}
